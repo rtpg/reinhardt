@@ -1,0 +1,14 @@
+{
+  "name": "reinhardt",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-express": "^0.3.3",
+    "purescript-generics": "~0.7.2",
+    "purescript-exists": "0.2.0"
+  }
+}
