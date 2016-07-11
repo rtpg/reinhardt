@@ -9,6 +9,7 @@
   "dependencies": {
     "purescript-express": "^0.3.3",
     "purescript-generics": "~0.7.2",
-    "purescript-exists": "0.2.0"
+    "purescript-exists": "0.2.0",
+    "purescript-either": "0.2.3"
   }
 }

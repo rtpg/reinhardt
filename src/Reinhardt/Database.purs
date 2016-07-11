@@ -1,7 +1,14 @@
 module Reinhardt.Database where
 
-import Reinhardt.Foreign (JSValue)
+import Prelude (bind)
 
+import Control.Monad.Eff (Eff)
+import Data.Maybe (Maybe)
+import Data.Either (Either)
+
+import Reinhardt.Foreign (JSValue)
+-- Reinhard DB effect types
+foreign import data RDB :: !
 
 -- reader lets you take a DB object and populate your user object
 data DBReader a = DBReader a
@@ -11,14 +18,32 @@ data DBWriter a = DBWriter a
 
 data DBField psType = RawValue psType
                     | Field (FieldDefinition psType)
+                    | Search (SearchParam psType)
+
+data SearchParam psType = SearchParam
+
 data FieldDefinition psType = FieldDefinition {
   toDBValue :: psType -> JSValue, -- unfortunately existential types aren't supported yet
   fromDBVaue :: JSValue -> psType -- but when they do, we'll unify the return of toDBValue
   -- and the input of fromDBValue
 }
 
+data DBError = DBError
 
 class Model userObj dbShape where
   dbStructure :: dbShape
   fromDB :: DBReader userObj
   toDB :: userObj -> DBWriter dbShape
+
+
+foreign import commitObject :: forall obj shape e. (Model obj shape) => obj -> Eff ( rWriteDB :: RDB | e) (Maybe obj)
+foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Array obj)
+
+lookupObject :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Either DBError obj)
+lookupObject searchParams = do
+  objs <- lookupObjects searchParams
+  if (length objs) > 1
+    then pure (Left DBError)
+    else pure $ case head objs of
+        Nothing -> Left DBError
+        Just obj -> Right obj
