@@ -29,8 +29,7 @@ signupPage req = do
       Nothing -> do
         createUser {
           username : req.header,
-          email: req.body,
-          uid: "999" -- TODO make more unique
+          email: req.body
         }
         return {
           body : "Created User with name " ++ req.header,

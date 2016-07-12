@@ -11,6 +11,10 @@ import Reinhardt.Foreign (JSValue)
 -- Reinhard DB effect types
 foreign import data RDB :: !
 
+-- foreign functions
+foreign import commitObject :: forall obj shape e. (Model obj shape) => obj -> Eff ( rWriteDB :: RDB | e) (Maybe obj)
+foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Array obj)
+
 -- reader lets you take a DB object and populate your user object
 data DBReader a = DBReader a
 
@@ -37,8 +41,6 @@ class Model userObj dbShape where
   toDB :: userObj -> DBWriter dbShape
 
 
-foreign import commitObject :: forall obj shape e. (Model obj shape) => obj -> Eff ( rWriteDB :: RDB | e) (Maybe obj)
-foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Array obj)
 
 lookupObject :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Either DBError obj)
 lookupObject searchParams = do
