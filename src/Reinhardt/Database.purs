@@ -1,10 +1,11 @@
 module Reinhardt.Database where
 
-import Prelude (bind)
+import Prelude (bind, (>), pure, ($))
 
 import Control.Monad.Eff (Eff)
-import Data.Maybe (Maybe)
-import Data.Either (Either)
+import Data.Array (length, head)
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.Either (Either(Left, Right))
 
 import Reinhardt.Foreign (JSValue)
 -- Reinhard DB effect types
