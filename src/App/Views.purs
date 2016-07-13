@@ -1,9 +1,9 @@
 module App.Views where
 
-import App.Models (DB, createUser, lookupUser)
+import App.Models (DB, createUser, lookupUser, User(User))
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe(Nothing, Just))
-import Prelude (return, bind, (++))
+import Prelude (return, bind, (++), ($))
 
 data Method = GET | POST
 
@@ -27,7 +27,7 @@ signupPage req = do
         status : 400
       }
       Nothing -> do
-        createUser {
+        createUser $ User {
           username : req.header,
           email: req.body
         }
@@ -40,7 +40,7 @@ lookupEmail :: forall e. Request -> Eff (read::DB | e) Response
 lookupEmail req = do
   mUser <- lookupUser req.header
   case mUser of
-      Just u -> return {
+      Just (User u) -> return {
         body: u.email,
         status: 200
       }

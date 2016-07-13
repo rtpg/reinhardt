@@ -1,19 +1,18 @@
 module App.Models where
 
-import Prelude (bind)
-
 import Data.Maybe
 import Control.Monad.Eff (Eff)
-
+import Prelude (bind)
+import Reinhardt.Database (DBWriter(DBWriter), DBReader(DBReader), FieldDefinition(FieldDefinition), class Model)
 import Reinhardt.Database.Fields (stringField)
 
 foreign import data DB :: !
 
 data User = User { username :: String, email :: String}
 
-type UserM = { username :: FieldDefinition String, email :: FieldDefinition String}
+data UserM = UserM { username :: FieldDefinition String, email :: FieldDefinition String}
 userM :: UserM
-userM = {
+userM = UserM {
   username : stringField,
   email: stringField
 }
@@ -28,5 +27,5 @@ foreign import lookupUser :: forall e. String -> Eff (read::DB | e) (Maybe User)
 
 createThenLookupUser:: forall e. User -> Eff (read::DB, write::DB | e) (Maybe User)
 createThenLookupUser u = do
-    createdUser <- createUser u
+    (User createdUser) <- createUser u
     lookupUser createdUser.username

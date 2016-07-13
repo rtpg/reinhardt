@@ -16,10 +16,10 @@ foreign import commitObject :: forall obj shape e. (Model obj shape) => obj -> E
 foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Array obj)
 
 -- reader lets you take a DB object and populate your user object
-data DBReader a = DBReader a
+data DBReader a = DBReader
 
 -- writer lets you take an object and write the DB with it
-data DBWriter a = DBWriter a
+data DBWriter a = DBWriter
 
 data DBField psType = RawValue psType
                     | Field (FieldDefinition psType)
@@ -29,7 +29,7 @@ data SearchParam psType = SearchParam
 
 data FieldDefinition psType = FieldDefinition {
   toDBValue :: psType -> JSValue, -- unfortunately existential types aren't supported yet
-  fromDBVaue :: JSValue -> psType -- but when they do, we'll unify the return of toDBValue
+  fromDBValue :: JSValue -> psType -- but when they do, we'll unify the return of toDBValue
   -- and the input of fromDBValue
 }
 
