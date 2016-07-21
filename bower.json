@@ -10,6 +10,8 @@
     "purescript-express": "^0.3.3",
     "purescript-generics": "~0.7.2",
     "purescript-exists": "0.2.0",
-    "purescript-either": "0.2.3"
+    "purescript-either": "0.2.3",
+    "purescript-node-process": "0.5.0",
+    "purescript-foldable-traversable": "0.4.2"
   }
 }

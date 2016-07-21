@@ -6,8 +6,11 @@ import Control.Monad.Eff (Eff)
 import Data.Array (length, head)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Either (Either(Left, Right))
+import Data.Exists (Exists, mkExists)
 
 import Reinhardt.Foreign (JSValue)
+import Reinhardt.Database.Reader (DBReader)
+import Reinhardt.Database.Fields (DBField)
 -- Reinhard DB effect types
 foreign import data RDB :: !
 
@@ -15,23 +18,10 @@ foreign import data RDB :: !
 foreign import commitObject :: forall obj shape e. (Model obj shape) => obj -> Eff ( rWriteDB :: RDB | e) (Maybe obj)
 foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Array obj)
 
--- reader lets you take a DB object and populate your user object
-data DBReader a = DBReader
+data DBRow = DBRow
 
 -- writer lets you take an object and write the DB with it
 data DBWriter a = DBWriter
-
-data DBField psType = RawValue psType
-                    | Field (FieldDefinition psType)
-                    | Search (SearchParam psType)
-
-data SearchParam psType = SearchParam
-
-data FieldDefinition psType = FieldDefinition {
-  toDBValue :: psType -> JSValue, -- unfortunately existential types aren't supported yet
-  fromDBValue :: JSValue -> psType -- but when they do, we'll unify the return of toDBValue
-  -- and the input of fromDBValue
-}
 
 data DBError = DBError
 
@@ -40,6 +30,10 @@ class Model userObj dbShape where
   fromDB :: DBReader userObj
   toDB :: userObj -> DBWriter dbShape
 
+data DbShape dbShape = DbShape dbShape
+-- TODO add verification here through a functional dependency
+model :: forall dbShape. dbShape -> Exists (DbShape)
+model shape = mkExists (DbShape shape)
 
 
 lookupObject :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Either DBError obj)

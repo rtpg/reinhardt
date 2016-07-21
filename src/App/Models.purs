@@ -2,9 +2,10 @@ module App.Models where
 
 import Data.Maybe
 import Control.Monad.Eff (Eff)
-import Prelude (bind)
-import Reinhardt.Database (DBWriter(DBWriter), DBReader(DBReader), FieldDefinition(FieldDefinition), class Model)
-import Reinhardt.Database.Fields (stringField)
+import Prelude (bind, ($))
+import Reinhardt.Database (DBWriter(DBWriter), class Model)
+import Reinhardt.Database.Fields (FieldDefinition(FieldDefinition), stringField)
+import Reinhardt.Database.Reader (DBReader(DBPure))
 
 foreign import data DB :: !
 
@@ -19,7 +20,7 @@ userM = UserM {
 
 instance userModel :: Model User UserM where
   dbStructure = userM
-  fromDB = DBReader
+  fromDB = DBPure $ User {username: "a" , email: "b"}
   toDB = \elt -> DBWriter
 
 foreign import createUser :: forall e. User -> Eff (write::DB | e) User
