@@ -8,11 +8,6 @@ import Data.Traversable (traverse)
 import Node.Express.Response (sendJson)
 import Prelude (return, ($), bind)
 
-handler = sendJson { greeting: "Merry Christmas!" }
-
-app = get "/" handler
-
-
 main = do
   args <- Process.argv
   Console.log "Hi guys"
