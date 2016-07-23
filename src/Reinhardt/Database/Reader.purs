@@ -2,7 +2,7 @@ module Reinhardt.Database.Reader where
 
 import Partial.Unsafe (unsafePartial)
 import Prelude (class Monad, class Applicative, class Apply, class Bind, class Functor, ($))
-import Reinhardt.Database.Fields (FieldDefinition(FieldDefinition))
+import Reinhardt.Database.Fields (DBField(RawValue), FieldDefinition(FieldDefinition))
 import Reinhardt.Foreign (JSValue)
 data Unit = Unit
 --  DB Row
@@ -44,4 +44,7 @@ instance dBReaderMonad :: Monad DBReader
 get :: forall a. FieldDefinition a -> DBReader a
 get (FieldDefinition f) = DBReader $ \row ->
     let dbVal = readObj row f.columnName in
-      f.fromDBValue dbVal
+      unsafePartial (f.fromDBValue dbVal)
+
+val :: forall a. (Partial) => DBField a -> a
+val (RawValue r) = r

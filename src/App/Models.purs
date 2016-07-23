@@ -2,15 +2,16 @@ module App.Models where
 
 import Data.Maybe
 import Control.Monad.Eff (Eff)
-import Prelude (bind, ($), pure)
-import Reinhardt.Database (DBWriter(DBWriter), class Model)
-import Reinhardt.Database.Fields (FieldDefinition, stringField)
+import Prelude (bind)
+import Reinhardt.Database (class Model)
+import Reinhardt.Database.Fields (DBField(RawValue), stringField)
+import Reinhardt.Database.Reader (val) as Reader
 
 foreign import data DB :: !
 
 data User = User { username :: String, email :: String}
 
-data UserM = UserM { username :: FieldDefinition String, email :: FieldDefinition String}
+data UserM = UserM { username :: DBField String, email :: DBField String}
 userM :: UserM
 userM = UserM {
   username : stringField "username",
@@ -19,8 +20,16 @@ userM = UserM {
 
 instance userModel :: Model User UserM where
   dbStructure = userM
-  fromDB = pure $ User {username: "a" , email: "b"}
-  toDB = \elt -> DBWriter
+  fromDB = \(UserM u) ->
+    User {
+      username: Reader.val u.username,
+      email: Reader.val u.email
+    }
+
+  toDB = \(User u) -> UserM {
+    username: RawValue u.username,
+    email: RawValue u.email
+  }
 
 foreign import createUser :: forall e. User -> Eff (write::DB | e) User
 foreign import lookupUser :: forall e. String -> Eff (read::DB | e) (Maybe User)

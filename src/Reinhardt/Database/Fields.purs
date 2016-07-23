@@ -1,12 +1,14 @@
 module Reinhardt.Database.Fields where
-import Partial.Unsafe (unsafePartial)
+
+import Prelude (($))
+
 import Reinhardt.Foreign (JSValue(JSString))
 
 data FieldDefinition psType = FieldDefinition {
   toDBValue :: psType -> JSValue, -- unfortunately existential types aren't supported yet
   -- here, the partial is to deal with the fact that only a specific
   -- JSValue will be used
-  fromDBValue :: JSValue -> psType, -- but when they do, we'll unify the return of toDBValue
+  fromDBValue :: (Partial) => JSValue -> psType, -- but when they do, we'll unify the return of toDBValue
   -- and the input of fromDBValue
   columnName :: String
 }
@@ -20,14 +22,11 @@ data DBField psType = RawValue psType
 stringToDB :: String -> JSValue
 stringToDB elt = JSString elt
 
-safeStringFromDB (JSString elt) = elt
+stringFromDB :: (Partial) => JSValue -> String
+stringFromDB (JSString elt) = elt
 
-stringFromDB :: JSValue -> String
-stringFromDB = unsafePartial (safeStringFromDB)
-
-
-stringField :: String -> FieldDefinition String
-stringField dbName = FieldDefinition {
+stringField :: String -> DBField String
+stringField dbName = Field $ FieldDefinition {
   toDBValue : stringToDB,
   fromDBValue : stringFromDB,
   columnName : dbName

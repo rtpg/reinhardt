@@ -18,7 +18,6 @@ foreign import data RDB :: !
 foreign import commitObject :: forall obj shape e. (Model obj shape) => obj -> Eff ( rWriteDB :: RDB | e) (Maybe obj)
 foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -> Eff (rReadDB :: RDB | e) (Array obj)
 
-data DBRow = DBRow
 
 -- writer lets you take an object and write the DB with it
 data DBWriter a = DBWriter
@@ -27,8 +26,8 @@ data DBError = DBError
 
 class Model userObj dbShape where
   dbStructure :: dbShape
-  fromDB :: DBReader userObj
-  toDB :: userObj -> DBWriter dbShape
+  fromDB :: (Partial) => dbShape -> userObj
+  toDB :: userObj -> dbShape
 
 data DbShape dbShape = DbShape dbShape
 -- TODO add verification here through a functional dependency
