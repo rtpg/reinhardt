@@ -1,9 +1,7 @@
 module Reinhardt.Database.Reader where
 
-import Partial.Unsafe (unsafePartial)
-import Prelude (class Monad, class Applicative, class Apply, class Bind, class Functor, ($))
-import Reinhardt.Database.Fields (DBField(RawValue), FieldDefinition(FieldDefinition))
-import Reinhardt.Foreign (JSValue)
+import Reinhardt.Database.Fields (DBField(RawValue))
+
 data Unit = Unit
 --  DB Row
 data DBRow = DBRow

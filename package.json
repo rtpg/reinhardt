@@ -1,0 +1,22 @@
+{
+  "name": "reinhardt",
+  "version": "0.1.0",
+  "description": "Purescript Web Utils",
+  "main": " ",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rtpg/reinhardt.git"
+  },
+  "author": "Raphael Gaschignard",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/rtpg/reinhardt/issues"
+  },
+  "homepage": "https://github.com/rtpg/reinhardt#readme"
+}

@@ -1,5 +1,6 @@
 "use strict";
-Sequelize = require('sequelize');
+
+var Sequelize = require('sequelize');
 var sequelize = new Sequelize('test_db', 'reinhardt', '', {
   host: 'localhost',
   dialect: 'sqlite',
@@ -10,6 +11,10 @@ var sequelize = new Sequelize('test_db', 'reinhardt', '', {
 //foreign import syncModel :: forall dbShape e. dbShape -> String -> Eff e Unit
 exports.syncModel = function(dbShape){
   return function(tableName){
-      sequelize.define(tableName, dbShape)
+    console.log("Defining " + tableName);
+    for(key in dbShape){
+      console.log(key);
+      console.log(dbShape);
+    }
   }
 };

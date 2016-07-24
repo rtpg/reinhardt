@@ -10,7 +10,8 @@ data FieldDefinition psType = FieldDefinition {
   -- JSValue will be used
   fromDBValue :: (Partial) => JSValue -> psType, -- but when they do, we'll unify the return of toDBValue
   -- and the input of fromDBValue
-  columnName :: String
+
+  sequelizeType :: String
 }
 
 data SearchParam psType = SearchParam
@@ -29,5 +30,5 @@ stringField :: String -> DBField String
 stringField dbName = Field $ FieldDefinition {
   toDBValue : stringToDB,
   fromDBValue : stringFromDB,
-  columnName : dbName
+  sequelizeType : "STRING"
 }
