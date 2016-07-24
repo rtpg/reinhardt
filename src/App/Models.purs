@@ -20,6 +20,7 @@ userM = UserM {
 
 instance userModel :: Model User UserM where
   dbStructure = userM
+  tableName = \_ -> \_ -> "user"
   fromDB = \(UserM u) ->
     User {
       username: Reader.val u.username,
