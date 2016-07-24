@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/rtpg/reinhardt/issues"
   },
-  "homepage": "https://github.com/rtpg/reinhardt#readme"
+  "homepage": "https://github.com/rtpg/reinhardt#readme",
+  "dependencies": {
+    "sequelize": "^3.23.6",
+    "sqlite3": "^3.1.4"
+  }
 }
