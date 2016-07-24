@@ -21,7 +21,7 @@ main = do
   args <- Process.argv
   Console.log "Hi guys"
   traverse Console.log (slice 2 (length args) args)
-  case (args !! 3) of
+  case (args !! 2) of
     Nothing -> Console.log "Please insert command"
     Just arg -> case arg of
       x | arg == "syncdb" -> syncModelsCommand

@@ -8,9 +8,6 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.Either (Either(Left, Right))
 import Data.Exists (Exists, mkExists)
 
-import Reinhardt.Foreign (JSValue)
-import Reinhardt.Database.Reader (DBReader)
-import Reinhardt.Database.Fields (DBField)
 -- Reinhard DB effect types
 foreign import data RDB :: !
 
