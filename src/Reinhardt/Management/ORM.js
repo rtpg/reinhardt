@@ -4,7 +4,11 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('test_db', 'reinhardt', '', {
   host: 'localhost',
   dialect: 'sqlite',
-  storage: 'test.db'
+  storage: 'test.db',
+  define:{
+    // prevent pluralisation
+    freezeTableName: true
+  }
 })
 // module Reinhardt.Management.ORM
 
@@ -19,7 +23,6 @@ exports.syncModel = function(dbShape){
   return function(tableName){
     // not sure why I gotta do this, might totally be wrong
     return function(){
-      console.log(arguments);
       dbShape = dbShape.value0;
       console.log("Defining " + tableName);
 

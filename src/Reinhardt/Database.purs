@@ -23,11 +23,13 @@ data DBWriter a = DBWriter
 
 data DBError = DBError
 
-class Model userObj dbShape where
+class DBTable dbShape where
+  tableName :: dbShape -> String
+
+class (DBTable dbShape) <= Model userObj dbShape where
   dbStructure :: dbShape
   -- TODO: figure out of tagging can make the table name not depend on anything
   -- see http://stackoverflow.com/questions/23983374/how-to-handle-functions-of-a-multi-parameter-typeclass-who-not-need-every-type
-  tableName :: dbShape -> userObj -> String
   fromDB :: (Partial) => dbShape -> userObj
   toDB :: userObj -> dbShape
 
@@ -36,9 +38,10 @@ data DbShape dbShape = DbShape {
   structure :: dbShape
 }
 -- TODO add verification here through a functional dependency
-model :: forall userObj dbShape. (Model userObj dbShape) => dbShape -> userObj -> Exists (DbShape)
-model shape obj = mkExists (DbShape {
-  tableName : tableName shape obj,
+-- this ensures that a Model instance exsts, even if its not needed
+model :: forall dbShape. (DBTable dbShape) => dbShape -> Exists (DbShape)
+model shape = mkExists (DbShape {
+  tableName : tableName shape,
   structure : shape
 })
 

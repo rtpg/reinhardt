@@ -10,6 +10,10 @@
     "purescript-console": "^1.0.0",
     "purescript-exists": "^1.0.0",
     "purescript-arrays": "^1.0.0",
-    "purescript-node-process": "^1.0.0"
+    "purescript-node-process": "^1.0.0",
+    "purescript-tuples": "^1.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^1.0.0"
   }
 }

@@ -10,8 +10,10 @@ data FieldDefinition psType = FieldDefinition {
   -- JSValue will be used
   fromDBValue :: (Partial) => JSValue -> psType, -- but when they do, we'll unify the return of toDBValue
   -- and the input of fromDBValue
-
-  sequelizeType :: String
+  columnName :: String,
+  sequelizeType :: String,
+  -- only used for foreign keys
+  refersToTable :: String
 }
 
 data SearchParam psType = SearchParam
@@ -20,6 +22,7 @@ data DBField psType = RawValue psType
                     | Field (FieldDefinition psType)
                     | Search (SearchParam psType)
 
+data ForeignKey obj m = ForeignKey obj m
 stringToDB :: String -> JSValue
 stringToDB elt = JSString elt
 
@@ -27,8 +30,10 @@ stringFromDB :: (Partial) => JSValue -> String
 stringFromDB (JSString elt) = elt
 
 stringField :: String -> DBField String
-stringField dbName = Field $ FieldDefinition {
+stringField columnName = Field $ FieldDefinition {
   toDBValue : stringToDB,
   fromDBValue : stringFromDB,
-  sequelizeType : "STRING"
+  columnName : columnName,
+  sequelizeType : "STRING",
+  refersToTable: ""
 }

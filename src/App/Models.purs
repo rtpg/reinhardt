@@ -3,7 +3,7 @@ module App.Models where
 import Data.Maybe
 import Control.Monad.Eff (Eff)
 import Prelude (bind)
-import Reinhardt.Database (class Model)
+import Reinhardt.Database (class DBTable, class Model)
 import Reinhardt.Database.Fields (DBField(RawValue), stringField)
 import Reinhardt.Database.Reader (val) as Reader
 
@@ -18,9 +18,11 @@ userM = UserM {
   email: stringField "email"
 }
 
+instance userTable :: DBTable UserM where
+  tableName = \_ -> "user"
+
 instance userModel :: Model User UserM where
   dbStructure = userM
-  tableName = \_ -> \_ -> "user"
   fromDB = \(UserM u) ->
     User {
       username: Reader.val u.username,

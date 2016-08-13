@@ -5,5 +5,5 @@ import Data.Exists (Exists)
 import Reinhardt.Database (model, DbShape, sentinelObj)
 models :: Array (Exists DbShape)
 models = [
-  model userM (sentinelObj::User)
+  model userM
 ]
