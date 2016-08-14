@@ -1,12 +1,12 @@
 module Reinhardt.Database where
 
-import Prelude (bind, (>), pure, ($))
-
 import Control.Monad.Eff (Eff)
 import Data.Array (length, head)
-import Data.Maybe (Maybe(Just, Nothing))
 import Data.Either (Either(Left, Right))
 import Data.Exists (Exists, mkExists)
+import Data.Function.Uncurried (Fn1)
+import Data.Maybe (Maybe(Just, Nothing))
+import Prelude (bind, (>), pure, ($))
 
 -- Reinhard DB effect types
 foreign import data RDB :: !
@@ -23,8 +23,14 @@ data DBWriter a = DBWriter
 
 data DBError = DBError
 
+-- wrapper for table builder
+data DBCons m d = DBCons (d -> m)
+mkShape :: forall a b. (a -> b) -> Exists (DBCons b)
+mkShape f = mkExists (DBCons f)
+
 class DBTable dbShape where
   tableName :: dbShape -> String
+  tableShape :: Exists (DBCons dbShape)
 
 class (DBTable dbShape) <= Model userObj dbShape where
   dbStructure :: dbShape
