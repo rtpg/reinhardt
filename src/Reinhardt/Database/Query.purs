@@ -1,13 +1,14 @@
 module Reinhardt.Database.Query where
 
+import Control.Monad.Aff (makeAff, Aff)
+import Control.Monad.Eff (Eff)
 import Data.List (List(Nil, Cons))
 import Data.Tuple (Tuple(Tuple))
-
+import Data.Unit (Unit)
 import Partial.Unsafe (unsafePartial)
-import Prelude (map, ($))
-import Reinhardt.Database (class Model, class DBTable, sentinelObj, castToShape, tableName, fromDB)
+import Prelude (map, ($), bind, pure)
+import Reinhardt.Database (class Model, sentinelObj, tableName, castToShape, fromDB)
 import Reinhardt.Database.Fields (DBField(Field), FieldDefinition(FieldDefinition), ForeignKey)
-
 import Unsafe.Coerce (unsafeCoerce)
 
 data QueryParam = QueryParam
@@ -16,9 +17,16 @@ data QueryParam = QueryParam
 -- params:
 -- table name (for lookup), paired with join params
 -- params
-foreign import sequelizeFindAll :: forall a b. a -> b -> Array FromSql
+foreign import rawSequelizeFindAll ::
+ forall e. List JData -> Array QueryParam -> -- params
+ (Array FromSql -> Eff e Unit)  -> -- callback
+ Eff e Unit
 
 foreign import data FromSql :: *
+
+sequelizeFindAll :: forall e. List JData -> Array QueryParam -> Aff e (Array FromSql)
+sequelizeFindAll m params = makeAff
+  (\error success -> rawSequelizeFindAll m params success)
 
 class SqlInflate model obj where
     sqlInflate :: model -> FromSql -> obj
@@ -33,12 +41,13 @@ class Findable model resultShape where
       }
     -- findAll :: model -> Array QueryParam -> Array resultShape
 
-rFindAll :: forall model obj. (Findable model obj, SqlInflate model obj) =>
-   model -> Array QueryParam -> Array obj
-rFindAll m params =
-    let sequelizeModel = buildFindModel (sentinelObj::obj) m
-        rawSqlData = sequelizeFindAll sequelizeModel params in
-        map (sqlInflate m) rawSqlData
+findAll :: forall model obj e. (Findable model obj, SqlInflate model obj) =>
+   model -> Array QueryParam -> Aff e (Array obj)
+findAll m params =
+    let sequelizeModel = buildFindModel (sentinelObj::obj) m in
+      do
+        rawSqlData <- sequelizeFindAll sequelizeModel params
+        pure $ map (sqlInflate m) rawSqlData
 
 instance inflatableModel::(Model nativeObj model) => SqlInflate model nativeObj where
     sqlInflate m = (\x -> unsafePartial $ fromDB (castToShape x::model))
@@ -51,16 +60,10 @@ instance inflatableField:: (SqlInflate mA a, Model b mB) =>
 
 instance findableModel::(Model nativeObj model) => Findable model nativeObj where
     buildFindModel _ m = Cons {source: (tableName m), name: (tableName m)} Nil
-    -- findAll m params  = map (unsafePartial fromDB) (mFindAll m params)
 
 data JoinWith a b = JoinWith a b
 
 type JData = {source :: String, name :: String}
-
-mFindAll :: forall model. (DBTable model) => model -> Array QueryParam -> Array model
-mFindAll m params =
-    let rawResults = sequelizeFindAll (Cons {source: (tableName m), name: (tableName m)} Nil) params in
-      map castToShape rawResults
 
 findModelFromFK :: forall obj m. DBField (ForeignKey obj m) -> JData
 findModelFromFK (Field (FieldDefinition fd)) = {source: fd.refersToTable, name: fd.columnName}
@@ -68,22 +71,13 @@ findModelFromFK _ = {source: "", name: ""} -- TODO make this fail
 
 joinedFindModel :: forall a mA f g.
   (Findable mA a) =>
-  a -> JoinWith mA (DBField (ForeignKey f g)) -> List {source:: String, name:: String}
+  a -> JoinWith mA (DBField (ForeignKey f g)) -> List JData
 joinedFindModel a (JoinWith (mA::mA)  (fkField:: DBField (ForeignKey f g))) =
   let prevFindModel = buildFindModel a mA
-      qq :: forall obj m. DBField (ForeignKey obj m) -> JData
-      qq = findModelFromFK
-      fieldFindModel = qq fkField  in
+      fieldFindModel = findModelFromFK fkField  in
           Cons (fieldFindModel::JData) (prevFindModel:: List JData)
 
 instance joinedFind::(Findable mA a, Model r mR) => Findable
   (JoinWith mA (DBField (ForeignKey r mR)))
   (Tuple a r) where
     buildFindModel a m = joinedFindModel (sentinelObj::a) m
-    -- findAll m params = sentinelObj
-    --  let fullModel = buildFindModel (sentinelObj::a) m
-    --      rawResults :: Array JSValue
-    --      rawResults = sequelizeFindAll fullModel params in
-    --      map castToShape rawResults
-
-    --sequelizeFindAll (buildFindModel m) params

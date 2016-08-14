@@ -2,10 +2,8 @@
 
 // module Reinhardt.Database.Query
 
-exports.sequelizeFindAll = function(){
-
+exports.rawSequelizeFindAll = function(models){
+  return function(params){
+    return true
+  }
 };
-
-exports.castDictInto = function(){
-  
-}
