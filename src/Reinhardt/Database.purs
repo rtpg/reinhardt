@@ -3,8 +3,7 @@ module Reinhardt.Database where
 import Control.Monad.Eff (Eff)
 import Data.Array (length, head)
 import Data.Either (Either(Left, Right))
-import Data.Exists (Exists, mkExists)
-import Data.Function.Uncurried (Fn1)
+import Data.Exists (runExists, Exists, mkExists)
 import Data.Maybe (Maybe(Just, Nothing))
 import Prelude (bind, (>), pure, ($))
 
@@ -17,6 +16,11 @@ foreign import lookupObjects :: forall obj shape e. (Model obj shape) => shape -
 
 -- helper for Model declarations
 foreign import sentinelObj :: forall a. a
+
+-- the following foreign import allows us to "cast" a javascript
+-- dictionarly into a single-argument type
+-- for example, castDictInto UserM {a: 1, b:2} = UserM {a: 1, b:2}
+foreign import castDictInto :: forall d m a. (d -> m) -> a -> m
 
 -- writer lets you take an object and write the DB with it
 data DBWriter a = DBWriter
@@ -31,6 +35,9 @@ mkShape f = mkExists (DBCons f)
 class DBTable dbShape where
   tableName :: dbShape -> String
   tableShape :: Exists (DBCons dbShape)
+
+castToShape :: forall x dbShape. (DBTable dbShape) => x -> dbShape
+castToShape = (runExists \(DBCons f) -> castDictInto f) tableShape
 
 class (DBTable dbShape) <= Model userObj dbShape where
   dbStructure :: dbShape

@@ -13,3 +13,7 @@ exports.lookupObjects = function(e){
 exports.sentinelObj = function(e){
 
 };
+
+exports.castDictInto = function(e){
+
+};
