@@ -1,14 +1,13 @@
 module Reinhardt.Database.Query where
 
-import Data.Exists (Exists, runExists)
 import Data.List (List(Nil, Cons))
 import Data.Tuple (Tuple(Tuple))
-import Data.Tuple.Nested (Tuple2)
+
 import Partial.Unsafe (unsafePartial)
 import Prelude (map, ($))
-import Reinhardt.Database (fromDB, DBCons(DBCons), tableShape, sentinelObj, class DBTable, tableName, class Model, castToShape)
+import Reinhardt.Database (class Model, class DBTable, sentinelObj, castToShape, tableName, fromDB)
 import Reinhardt.Database.Fields (DBField(Field), FieldDefinition(FieldDefinition), ForeignKey)
-import Reinhardt.Foreign (JSValue)
+
 import Unsafe.Coerce (unsafeCoerce)
 
 data QueryParam = QueryParam
