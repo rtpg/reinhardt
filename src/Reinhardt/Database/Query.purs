@@ -2,6 +2,7 @@ module Reinhardt.Database.Query where
 
 import Control.Monad.Aff (makeAff, Aff)
 import Control.Monad.Eff (Eff)
+import Data.Array (reverse, fromFoldable)
 import Data.List (List(Nil, Cons))
 import Data.Tuple (Tuple(Tuple))
 import Data.Unit (Unit)
@@ -18,13 +19,13 @@ data QueryParam = QueryParam
 -- table name (for lookup), paired with join params
 -- params
 foreign import rawSequelizeFindAll ::
- forall e. List JData -> Array QueryParam -> -- params
+ forall e. Array JData -> Array QueryParam -> -- params
  (Array FromSql -> Eff e Unit)  -> -- callback
  Eff e Unit
 
 foreign import data FromSql :: *
 
-sequelizeFindAll :: forall e. List JData -> Array QueryParam -> Aff e (Array FromSql)
+sequelizeFindAll :: forall e. Array JData -> Array QueryParam -> Aff e (Array FromSql)
 sequelizeFindAll m params = makeAff
   (\error success -> rawSequelizeFindAll m params success)
 
@@ -44,9 +45,16 @@ class Findable model resultShape where
 findAll :: forall model obj e. (Findable model obj, SqlInflate model obj) =>
    model -> Array QueryParam -> Aff e (Array obj)
 findAll m params =
-    let sequelizeModel = buildFindModel (sentinelObj::obj) m in
+    let sequelizeModel = buildFindModel (sentinelObj::obj) m
+        aModel :: Array JData
+        -- complicated but findModel builds something like
+        --    Cons F1 (Cons F2 (Cons F3 (Cons Model Nil))
+        --  we transform this into
+        --    [Model, F3, F2, F1]
+        --  before handing it to rawSequelizeFindAll
+        aModel = reverse $ fromFoldable sequelizeModel in
       do
-        rawSqlData <- sequelizeFindAll sequelizeModel params
+        rawSqlData <- sequelizeFindAll aModel params
         pure $ map (sqlInflate m) rawSqlData
 
 instance inflatableModel::(Model nativeObj model) => SqlInflate model nativeObj where
