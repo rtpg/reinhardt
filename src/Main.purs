@@ -16,6 +16,8 @@ import Prelude (bind, (==), Unit, otherwise, ($))
 import Reinhardt.Management.ORM (syncModelsCommand)
 import TestApp (runFindAll)
 
+foreign import ensureDbg :: forall e. Eff e Unit
+
 main :: forall e. Eff
                  ( err :: EXCEPTION
                  , process :: Process.PROCESS
@@ -24,6 +26,7 @@ main :: forall e. Eff
                  )
                  Unit
 main = do
+  ensureDbg
   args <- Process.argv
   Console.log "Hi guys"
   traverse Console.log (slice 2 (length args) args)

@@ -18,19 +18,11 @@ var transformShape = function(field){
   return Sequelize[sType];
 };
 
-//foreign import syncModel :: forall dbShape e. dbShape -> String -> Eff e Unit
-exports.syncModel = function(dbShape){
+//foreign import syncModel :: SequelizeShape -> String -> Eff e Unit
+exports.syncModel = function(shape){
   return function(tableName){
-    // not sure why I gotta do this, might totally be wrong
     return function(){
-      dbShape = dbShape.value0;
-      console.log("Defining " + tableName);
-
-      var sequelizeObj = {}
-      for(var key in dbShape){
-        sequelizeObj[key] = transformShape(dbShape[key]);
-      }
-      sequelize.define(tableName, sequelizeObj).sync();
+      sequelize.define(tableName, shape).sync();
     };
   };
 };

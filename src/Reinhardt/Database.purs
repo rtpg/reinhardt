@@ -27,6 +27,12 @@ data DBWriter a = DBWriter
 
 data DBError = DBError
 
+
+foreign import data SequelizeDef :: *
+-- the following will get a special SequelizeDef object
+foreign import buildSequelizeDef :: forall dbShape. dbShape -> SequelizeDef
+
+
 -- wrapper for table builder
 data DBCons m d = DBCons (d -> m)
 mkShape :: forall a b. (a -> b) -> Exists (DBCons b)
