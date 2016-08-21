@@ -43,7 +43,7 @@ class DBTable dbShape where
   tableShape :: Exists (DBCons dbShape)
 
 castToShape :: forall x dbShape. (DBTable dbShape) => x -> dbShape
-castToShape = (runExists \(DBCons f) -> castDictInto f) tableShape
+castToShape = (runExists \(DBCons f) -> castDictInto f) (tableShape::Exists (DBCons dbShape))
 
 class (DBTable dbShape) <= Model userObj dbShape where
   dbStructure :: dbShape

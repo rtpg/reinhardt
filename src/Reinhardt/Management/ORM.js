@@ -7,7 +7,9 @@ var sequelize = new Sequelize('test_db', 'reinhardt', '', {
   storage: 'test.db',
   define:{
     // prevent pluralisation
-    freezeTableName: true
+    freezeTableName: true,
+    // no timestamps
+    timestamps: false
   }
 })
 // module Reinhardt.Management.ORM
