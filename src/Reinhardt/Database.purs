@@ -43,7 +43,9 @@ class DBTable dbShape where
   tableShape :: Exists (DBCons dbShape)
 
 castToShape :: forall x dbShape. (DBTable dbShape) => x -> dbShape
-castToShape = (runExists \(DBCons f) -> castDictInto f) (tableShape::Exists (DBCons dbShape))
+castToShape =
+  let transformer = tableShape in
+    runExists (\(DBCons f) -> castDictInto f) transformer
 
 class (DBTable dbShape) <= Model userObj dbShape where
   dbStructure :: dbShape

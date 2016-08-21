@@ -16,8 +16,10 @@ exports.sentinelObj = function(e){
 
 };
 
-exports.castDictInto = function(e){
-
+exports.castDictInto = function(f){
+    return function(x){
+      return f(x);
+    }
 };
 // would enjoy being able to write this in purescript
 var transformShape = function(field){

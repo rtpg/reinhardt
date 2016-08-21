@@ -25,6 +25,7 @@ foreign import rawSequelizeFindAll ::
 
 -- listing for exposure in other FFI models
 foreign import modelCache :: forall a. a
+
 foreign import data FromSql :: *
 
 sequelizeFindAll :: forall e. Array JData -> Array QueryParam -> Aff e (Array FromSql)
@@ -60,7 +61,10 @@ findAll m params =
         pure $ map (sqlInflate m) rawSqlData
 
 instance inflatableModel::(Model nativeObj model) => SqlInflate model nativeObj where
-    sqlInflate m = (\x -> unsafePartial $ fromDB (castToShape x::model))
+    sqlInflate m = (\x ->
+      let newShape :: model
+          newShape = castToShape x in
+            unsafePartial $ fromDB newShape)
 
 instance inflatableField:: (SqlInflate mA a, Model b mB) =>
   SqlInflate (JoinWith mA (DBField (ForeignKey mB b))) (Tuple a b) where
