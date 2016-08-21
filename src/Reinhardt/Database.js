@@ -1,5 +1,7 @@
 "use strict";
 
+var Sequelize = require('sequelize');
+
 // module Reinhardt.Database
 
 exports.commitObject = function(e){

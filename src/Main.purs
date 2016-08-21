@@ -2,7 +2,8 @@ module Main where
 
 import Control.Monad.Eff.Console as Console
 import Node.Process as Process
-import App.Models (User(User))
+import App.Config (models)
+import App.Models (userM, User(User))
 import Control.Alternative (pure)
 import Control.Monad.Aff (launchAff)
 import Control.Monad.Eff (Eff)
@@ -13,8 +14,9 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Data.Traversable (traverse)
 import Data.Unit (unit)
 import Prelude (bind, (==), Unit, otherwise, ($))
+import Reinhardt.Database.Query (findAll)
+import Reinhardt.Database.Setup (loadModels)
 import Reinhardt.Management.ORM (syncModelsCommand)
-import TestApp (runFindAll)
 
 foreign import ensureDbg :: forall e. Eff e Unit
 
@@ -33,10 +35,10 @@ main = do
   case (args !! 2) of
     Nothing -> do
         Console.log "Running example..."
+        loadModels models
         launchAff (
           do
-            users <- runFindAll
-            liftEff (Console.log "Ran findAll!")
+            users <- findAll userM []
             traverse (\(User elt) -> liftEff $ Console.log elt.username) (users)
         )
         pure unit

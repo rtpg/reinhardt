@@ -23,6 +23,8 @@ foreign import rawSequelizeFindAll ::
  (Array FromSql -> Eff e Unit)  -> -- callback
  Eff e Unit
 
+-- listing for exposure in other FFI models
+foreign import modelCache :: forall a. a
 foreign import data FromSql :: *
 
 sequelizeFindAll :: forall e. Array JData -> Array QueryParam -> Aff e (Array FromSql)

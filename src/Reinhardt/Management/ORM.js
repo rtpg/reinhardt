@@ -22,7 +22,7 @@ var transformShape = function(field){
 exports.syncModel = function(shape){
   return function(tableName){
     return function(){
-      sequelize.define(tableName, shape).sync();
+      sequelize.define(tableName, shape.value0).sync();
     };
   };
 };

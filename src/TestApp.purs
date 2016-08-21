@@ -1,6 +1,6 @@
 module TestApp where
 
-import App.Models (userM, User(User))
+import App.Models (userM, User)
 import Control.Monad.Aff (Aff)
 
 import Reinhardt.Database.Query (findAll)

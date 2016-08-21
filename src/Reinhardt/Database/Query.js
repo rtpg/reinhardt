@@ -4,9 +4,8 @@
 
 var tuple = require("../Data.Tuple");
 
-var modelCache = {};
 function lookupModel(name){
-  return modelCache[name];
+  return exports.modelCache[name];
 }
 
 // build the include list based off of the models
@@ -52,20 +51,24 @@ function unwrapModel(data, models){
   }
   return returnValue;
 }
+
+exports.modelCache = {};
+
 exports.rawSequelizeFindAll = function(models){
   return function(params){
     return function(callback){
-      console.log("Running rawSequelizeFindAll");
-      var baseModel = lookupModel(models[0].name),
-          includes = buildIncludes(models);
-      baseModel.findAll({
-        include: includes
-      }).then(
-        function(data){
-          var tupledData = unwrapModel(data, models);
-          callback(tupledData)();
-        }
-      )
+        return function(){
+        var baseModel = lookupModel(models[0].name),
+            includes = buildIncludes(models);
+        baseModel.findAll({
+          include: includes
+        }).then(
+          function(data){
+            var tupledData = unwrapModel(data, models);
+            callback(tupledData)();
+          }
+        );
+      }
     }
   }
 };
