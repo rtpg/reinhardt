@@ -1,6 +1,9 @@
 module TestApp where
 
-import Reinhardt.Database (sentinelObj)
+import App.Models (userM, User(User))
+import Control.Monad.Aff (Aff)
 
+import Reinhardt.Database.Query (findAll)
 
-runFindAll = findAll
+runFindAll :: forall e. Aff e (Array User)
+runFindAll = findAll userM []

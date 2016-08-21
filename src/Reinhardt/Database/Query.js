@@ -55,6 +55,7 @@ function unwrapModel(data, models){
 exports.rawSequelizeFindAll = function(models){
   return function(params){
     return function(callback){
+      console.log("Running rawSequelizeFindAll");
       var baseModel = lookupModel(models[0].name),
           includes = buildIncludes(models);
       baseModel.findAll({
