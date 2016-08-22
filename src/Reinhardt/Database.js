@@ -16,7 +16,7 @@ exports.sentinelObj = function(e){
 
 };
 
-exports.castDictInto = function(f){
+exports.castDictIntoModelObj = function(f){
     return function(x){
       return f(x);
     }

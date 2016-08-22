@@ -19,8 +19,8 @@ foreign import sentinelObj :: forall a. a
 
 -- the following foreign import allows us to "cast" a javascript
 -- dictionarly into a single-argument type
--- for example, castDictInto UserM {a: 1, b:2} = UserM {a: 1, b:2}
-foreign import castDictInto :: forall d m a. (d -> m) -> a -> m
+-- for example, castDictInto UserM {a: 1, b:2} = UserM {a: Val 1, b: Val 2}
+foreign import castDictIntoModelObj :: forall d m a. (d -> m) -> a -> m
 
 -- writer lets you take an object and write the DB with it
 data DBWriter a = DBWriter
@@ -45,7 +45,7 @@ class DBTable dbShape where
 castToShape :: forall x dbShape. (DBTable dbShape) => x -> dbShape
 castToShape =
   let transformer = tableShape in
-    runExists (\(DBCons f) -> castDictInto f) transformer
+    runExists (\(DBCons f) -> castDictIntoModelObj f) transformer
 
 class (DBTable dbShape) <= Model userObj dbShape where
   dbStructure :: dbShape

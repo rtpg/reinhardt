@@ -9,7 +9,7 @@ import Control.Monad.Aff (launchAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Exception (EXCEPTION)
-import Data.Array (slice, length, (!!))
+import Data.Array ((!!))
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Traversable (traverse)
 import Data.Unit (unit)
@@ -30,8 +30,7 @@ main :: forall e. Eff
 main = do
   ensureDbg
   args <- Process.argv
-  Console.log "Hi guys"
-  traverse Console.log (slice 2 (length args) args)
+  Console.log "Hi my party people"
   case (args !! 2) of
     Nothing -> do
         Console.log "Running example..."
@@ -39,7 +38,9 @@ main = do
         launchAff (
           do
             users <- findAll userM []
-            traverse (\(User elt) -> liftEff $ Console.log elt.username) (users)
+            traverse
+              (\(User elt) -> liftEff $ Console.log elt.username)
+              users
         )
         pure unit
     Just arg -> case arg of
