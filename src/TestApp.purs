@@ -25,11 +25,3 @@ example = do
         users
   )
   pure unit
-
--- launchAff (
---   do
---     users <- findAll userM []
---     traverse
---       (\(User elt) -> liftEff $ Console.log elt.username)
---       users
--- )
