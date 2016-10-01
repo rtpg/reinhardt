@@ -4,6 +4,7 @@
 
 var tuple = require("../Data.Tuple");
 
+// TODO generalise this
 function lookupModel(name){
   return exports.modelCache[name];
 }

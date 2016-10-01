@@ -13,9 +13,10 @@ import Data.Array ((!!))
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Traversable (traverse)
 import Data.Unit (unit)
-import Prelude (bind, (==), Unit, otherwise, ($))
+import Prelude (bind, (==), Unit, otherwise, ($), (<>))
 import Reinhardt.Database.Query (findAll)
 import Reinhardt.Database.Setup (loadModels)
+import Reinhardt.Database.Write (insertDB)
 import Reinhardt.Management.ORM (syncModelsCommand)
 
 foreign import ensureDbg :: forall e. Eff e Unit
@@ -30,16 +31,23 @@ main :: forall e. Eff
 main = do
   ensureDbg
   args <- Process.argv
-  Console.log "Hi my party people"
   case (args !! 2) of
     Nothing -> do
         Console.log "Running example..."
         loadModels models
         launchAff (
           do
+            let exampleUser = User { username: "test_user", email: "test@example.com" }
+            let anotherUser = User { username: "another_user", email: "test2@example.com" }
+            liftEff $ Console.log "Writing Users to DB..."
+            insertDB exampleUser userM
+            insertDB anotherUser userM
+            liftEff $ Console.log "Reading Saved Users...."
             users <- findAll userM []
             traverse
-              (\(User elt) -> liftEff $ Console.log elt.username)
+              (\(User elt) -> do
+                liftEff $ Console.log ("username: " <> elt.username)
+                liftEff $ Console.log ("email: " <> elt.email))
               users
         )
         pure unit
